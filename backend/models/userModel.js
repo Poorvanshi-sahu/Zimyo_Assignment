@@ -14,9 +14,24 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   password: { type: String, required: [true, 'Please provide password'], minLength:6 },
+  recipes:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Recipe",
+  }],
+  follower:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"User"
+  }],
+  following:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"User"
+  }]
 });
 
+
+// Before saving password create hash and save it as password
 userSchema.pre("save", async function (next) {
+  // check password is changed or not
   if (!this.isModified("password")) {
     next();
   }
@@ -24,6 +39,7 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
+// Match password whether user given password is equals to saved hash 
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

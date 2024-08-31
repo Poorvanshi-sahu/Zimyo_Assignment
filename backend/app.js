@@ -9,12 +9,18 @@ const cors = require("cors")
 const errorHandlerMiddleware =  require("./middlewares/errorHandler");
 const cookieParser = require("cookie-parser");
 
+// for security
+const rateLimiter= require('express-rate-limit')
+const helmet = require('helmet')
+const xss = require('xss-clean')
+const mongoSanitize = require('express-mongo-sanitize')
+
 if (process.env.NODE_ENV !== "production") {
     require("dotenv").config({ path: "./config/.env" });
 }
 
+// Middleware setup
 app.use(express.json())
-app.use(cors())
 app.use(cookieParser(process.env.JWT_SECRET))
 
 app.get("/",(req,res)=>{
@@ -31,6 +37,17 @@ app.use(notFoundMiddleware)
 
 // all kind of API error will handle here
 app.use(errorHandlerMiddleware);
+
+app.set('trust proxy', 1)
+app.use(rateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 60
+}))
+
+app.use(helmet())
+app.use(cors())
+app.use(xss())
+app.use(mongoSanitize())
 
 const startApp = ()=>{
     // connection to database establish

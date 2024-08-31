@@ -1,8 +1,11 @@
 const express = require('express');
-const { getUserProfile } = require('../controllers/userController');
+const { getUserProfile, getAllUsers, getSingleUser, followAndUnfollowUser } = require('../controllers/userController');
 const { protect } = require('../middlewares/authentication');
 const router = express.Router();
 
-router.route('/profile').get(protect, getUserProfile);
+router.get('/profile',protect, getUserProfile);
+router.get('/profile/singleUser/:id', protect, getSingleUser)
+router.get('/profile/allUsers', protect, getAllUsers);
+router.post('/followUnfollowUser/:id', protect, followAndUnfollowUser)
 
 module.exports = router;

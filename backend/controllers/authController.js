@@ -14,10 +14,12 @@ const registerUser = async (req, res) => {
 
   const user = await User.create({ name, email, password });
 
+  // Generate token using jwt
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
   const oneDay = 1000 * 60 * 60 * 24;
 
+  // save token in cookie to establish a session just after user is created
   res.cookie("accessToken", token ,{
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -54,6 +56,7 @@ const loginUser = async (req, res) => {
 
   const oneDay = 1000 * 60 * 60 * 24;
 
+  // save token in cookie to establish a session, when user login
   res.cookie("accessToken", token ,{
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -66,6 +69,7 @@ const loginUser = async (req, res) => {
 };
 
 const logOut = (req, res) => {
+  // on logout clear token from cookies
   res.cookie("accessToken", "logout", {
     httpOnly: true,
     expires: new Date(Date.now()),
