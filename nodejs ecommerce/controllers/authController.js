@@ -1,53 +1,72 @@
-// controllers/authController.js
-const User = require('../models/userModel');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
-const registerUser = async (req, res) => {
-    const { username, email, password } = req.body;
+const { userServices: User } = require("../services");
+const { StatusCodes } = require("http-status-codes");
 
-    const userExists = await User.findOne({ where: { email } });
-
-    if (userExists) {
-        return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await User.create({
-        username,
-        email,
-        password: hashedPassword,
-    });
-
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-        expiresIn: '1d',
-    });
-
-    res.status(201).json({ token, user: { id: user.id, username, email } });
+const register = async (req, res) => {
+  try {
+    const reqData = { userName, email, password } = req.body;
+    const resp = await User.register(reqData);
+    return res.status(resp.httpStatus).json(resp.body);
+  } catch (error) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, msg: "Something Went Wrong", data: {} });
+  }
 };
 
-const loginUser = async (req, res) => {
-    const { email, password } = req.body;
+const login = async (req, res) => {
+  try {
+    const reqData = { email, password } = req.body;
+    const resp = await User.login(reqData);
+    return res.status(resp.httpStatus).json(resp.body);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, msg: "Something Went Wrong", data: {} });
+  }
+};
 
-    const user = await User.findOne({ where: { email } });
+const getProfile = async (req, res) => {
+  try {
+    const userId = req._decoded.id;
+    const resp = await User.getProfile(userId);
 
-    if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-        return res.status(401).json({ message: 'Invalid password' });
-    }
-
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-        expiresIn: '1d',
-    });
-
-    res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
+    return res.status(resp.httpStatus).json(resp.body);
+  } catch (error) {
+    res
+    .status(StatusCodes.INTERNAL_SERVER_ERROR)
+    .json({ success: false, msg: "Something Went Wrong", data: {} });
+  }
 };
 
 
-module.exports = {registerUser, loginUser}
+const getAllProfiles = async (req, res) => {
+  try {
+    const reqData = req._decoded.id;
+    const resp = await User.getAllProfiles(reqData);
+
+    return res.status(resp.httpStatus).json(resp.body);
+  } catch (error) {
+    res
+    .status(StatusCodes.INTERNAL_SERVER_ERROR)
+    .json({ success: false, msg: "Something Went Wrong", data: {} });
+  }
+
+};
+
+// const updateProfile = async(req,res)=>{
+//   try {
+//     const reqData = req._decoded.id;
+//     const resp = await User.updateProfile(reqData);
+
+//     return res.status(resp.httpStatus).json(resp.body);
+//   } catch (error) {
+//     res
+//     .status(StatusCodes.INTERNAL_SERVER_ERROR)
+//     .json({ success: false, msg: "Something Went Wrong", data: {} });
+//   }
+// }
+
+
+
+module.exports = { register, login, getProfile, getAllProfiles };

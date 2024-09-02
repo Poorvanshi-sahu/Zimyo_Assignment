@@ -2,12 +2,12 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const { StatusCodes } = require('http-status-codes');
 
-const protect = async (req, res, next) => {
+const authentication = async (req, res, next) => {
   
   try {
     const { accessToken } = req.signedCookies;
 
-    const token = accessToken
+    const token = accessToken;
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
@@ -19,4 +19,4 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect }
+module.exports = authentication

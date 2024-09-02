@@ -1,5 +1,4 @@
-const authMiddleware = require("./authentication");
 const notFoundMiddleware = require("./notFound")
-const errorHandlerMiddleware = require("./errorHandler");
+const verifyTokenMiddleware = require("./verifyToken")
 
-module.exports = {authMiddleware, notFoundMiddleware, errorHandlerMiddleware};
+module.exports = {notFoundMiddleware, verifyTokenMiddleware}

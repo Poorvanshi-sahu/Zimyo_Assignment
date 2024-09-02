@@ -3,13 +3,9 @@ const express = require("express")
 const app = express()
 const connectDB = require("./config/connect")
 const {userRoutes, recipeRoutes, authRoutes} = require("./routes");
-const { notFoundMiddleware } = require("./middlewares");
-const cors = require("cors")
-
-const errorHandlerMiddleware =  require("./middlewares/errorHandler");
+const { notFoundMiddleware, errorHandlerMiddleware } = require("./middlewares");
 const cookieParser = require("cookie-parser");
-
-// for security
+const cors = require("cors")
 const rateLimiter= require('express-rate-limit')
 const helmet = require('helmet')
 const xss = require('xss-clean')
@@ -19,8 +15,9 @@ if (process.env.NODE_ENV !== "production") {
     require("dotenv").config({ path: "./config/.env" });
 }
 
-// Middleware setup
+// middleware setup
 app.use(express.json())
+app.use(cors())
 app.use(cookieParser(process.env.JWT_SECRET))
 
 app.get("/",(req,res)=>{
@@ -44,8 +41,8 @@ app.use(rateLimiter({
   max: 60
 }))
 
+// for security
 app.use(helmet())
-app.use(cors())
 app.use(xss())
 app.use(mongoSanitize())
 

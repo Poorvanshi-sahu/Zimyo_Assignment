@@ -1,62 +1,77 @@
-// controllers/productController.js
-const Product = require('../models/productModel');
-
-const getAllProducts = async (req, res) => {
-    const products = await Product.findAll();
-    res.json(products);
-};
-const getProductById = async (req, res) => {
-    const product = await Product.findByPk(req.params.id);
-
-    if (!product) {
-        return res.status(404).json({ message: 'Product not found' });
-    }
-
-    res.json(product);
-};
+const { productServices: Product } = require("../services");
+const { StatusCodes } = require("http-status-codes");
 
 const createProduct = async (req, res) => {
-    const { name, description, price, imageUrl, inventory } = req.body;
-
-    const product = await Product.create({
-        name,
-        description,
-        price,
-        imageUrl,
-        inventory,
-    });
-
-    res.status(201).json(product);
+  try {
+    // if userRole is user throw error
+    // return res
+    // .status(StatusCodes.INTERNAL_SERVER_ERROR)
+    // .json({ success: false, msg: "Something Went Wrong", data: {} });
+    const reqData = { name, description, price, image, inventory } = req.body;
+    reqData.userId = req._decoded.id;
+    const resp = await Product.createProduct(reqData);
+    res.status(resp.httpStatus).json(resp.body);
+  } catch (error) {
+    res
+    .status(StatusCodes.INTERNAL_SERVER_ERROR)
+    .json({ success: false, msg: "Something Went Wrong", data: {} });
+  }
 };
-const updateProduct = async (req, res) => {
-    const { name, description, price, imageUrl, inventory } = req.body;
-    const product = await Product.findByPk(req.params.id);
 
-    if (!product) {
-        return res.status(404).json({ message: 'Product not found' });
-    }
+const getAllProducts = async (req, res) => {
+  try {
+    const resp = await Product.getAllProducts();
+    res.status(resp.httpStatus).json(resp.body);
+  } catch (error) {
+    res
+    .status(StatusCodes.INTERNAL_SERVER_ERROR)
+    .json({ success: false, msg: "Something Went Wrong", data: {} });
+  }
+};
 
-    product.name = name || product.name;
-    product.description = description || product.description;
-    product.price = price || product.price;
-    product.imageUrl = imageUrl || product.imageUrl;
-    product.inventory = inventory || product.inventory;
-
-    await product.save();
-
-    res.json(product);
+const getProduct = async (req, res) => {
+  try {
+    const resp = await Product.getProduct(req.params.id);
+    res.status(resp.httpStatus).json(resp.body);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, msg: "Something Went Wrong", data: {} });
+  }
 };
 
 const deleteProduct = async (req, res) => {
-    const product = await Product.findByPk(req.params.id);
-
-    if (!product) {
-        return res.status(404).json({ message: 'Product not found' });
+    try {
+        // if userRole is user throw error
+        // return res
+        // .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        // .json({ success: false, msg: "Something Went Wrong", data: {} });
+        const resp = await Product.deleteProduct(req.params.id);
+        return res.status(resp.httpStatus).json(resp.body);
+    } catch (error) {
+        return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, msg: "Something Went Wrong", data: {} });
     }
+  };
 
-    await product.destroy();
+  const updateProduct = async (req, res) => {
+    try {
+        const reqData = {name, description, price, image, inventory } = req.body;
+        reqData.id = req.params.id;
+        const resp = await Product.updateProduct(reqData);
+        return res.status(resp.httpStatus).json(resp.body);
+    } catch (error) {
+        res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, msg: "Something Went Wrong", data: {} });
+    }
+  };
 
-    res.json({ message: 'Product removed' });
+module.exports = {
+  createProduct,
+  getAllProducts,
+  getProduct,
+  deleteProduct,
+  updateProduct,
 };
-
-module.exports = {getAllProducts, getProductById, createProduct, updateProduct, deleteProduct}
