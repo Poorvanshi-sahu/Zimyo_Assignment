@@ -8,6 +8,6 @@ router.post('/register', register);
 router.post('/login', login);
 router.get('/profile', verifyToken, getProfile);
 router.get("/allProfiles",verifyToken, getAllProfiles);
-// router.get("/updateProfile", verifyToken, updateProfile);
+
 
 module.exports = router;

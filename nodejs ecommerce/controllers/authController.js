@@ -54,19 +54,4 @@ const getAllProfiles = async (req, res) => {
 
 };
 
-// const updateProfile = async(req,res)=>{
-//   try {
-//     const reqData = req._decoded.id;
-//     const resp = await User.updateProfile(reqData);
-
-//     return res.status(resp.httpStatus).json(resp.body);
-//   } catch (error) {
-//     res
-//     .status(StatusCodes.INTERNAL_SERVER_ERROR)
-//     .json({ success: false, msg: "Something Went Wrong", data: {} });
-//   }
-// }
-
-
-
 module.exports = { register, login, getProfile, getAllProfiles };

@@ -216,32 +216,6 @@ class User {
         },
       };
   }
-
-
-  // static async updateProfile(userId) {
-  //   const result = await queryDatabase(queries.getProfile(),[userId]);
-  //   if(!result){
-  //       return{
-  //           httpStatus: StatusCodes.NOT_FOUND,
-  //           body: {
-  //             success: false,
-  //             msg: "User not found",
-  //             data: {},
-  //           },
-  //         };
-  //   }
-
-
-
-  //   return {
-  //       httpStatus: StatusCodes.OK,
-  //       body: {
-  //         success: true,
-  //         msg: "All Users Profile",
-  //         data: result,
-  //       },
-  //     };
-  // }
 }
 
 module.exports = User;
